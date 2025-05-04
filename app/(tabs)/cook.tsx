@@ -1,111 +1,136 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
+import { router } from 'expo-router';
 
 export default function CookScreen() {
-
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.safeArea}>
+            <StatusBar barStyle="dark-content" />
+            
+            {/* Main Content */}
+            <View style={styles.contentContainer}>
+                {/* Welcome Section */}
+                <View style={styles.welcomeSection}>
+                    <Text style={styles.welcomeText}>Welcome, Chef Rass!</Text>
+                    <Image
+                        source={require('../../assets/icons/chef_image.png')}
+                        style={styles.chefImage}
+                        resizeMode="contain"
+                    />
+                </View>
 
+                {/* Description & Buttons */}
+                <View style={styles.actionSection}>
+                    <Text style={styles.subtitle}>
+                        Ready to turn fresh ingredients into happy bites?
+                    </Text>
+                    
+                    <View style={styles.buttonsContainer}>
+                        <TouchableOpacity 
+                            style={styles.primaryButton}
+                            onPress={() => router.push('/recipe')}
+                        >
+                            <View style={styles.buttonContent}>
+                                <Image 
+                                    source={require('../../assets/icons/link_icon.svg')}
+                                    style={styles.linkIcon}
+                                />
+                                <Text style={styles.primaryButtonText}>Import a recipe</Text>
+                            </View>
+                        </TouchableOpacity>
 
-            {/* Welcome Text */}
-            <Text style={styles.welcomeText}>Welcome, Chef Rass!</Text>
-
-            {/* Dish Image */}
-            <Image
-                source={require('../../assets/jelly.png')}
-                style={styles.dishImage}
-                resizeMode="contain"
-            />
-
-            {/* Description */}
-            <Text style={styles.subtitle}>
-                Ready to turn fresh ingredients into{'\n'}happy bites?
-            </Text>
-
-            {/* Buttons */}
-            <TouchableOpacity style={styles.primaryButton}>
-                <Text style={styles.primaryButtonText}>🔗 Import a recipe</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.secondaryButton}>
-                <Text style={styles.secondaryButtonText}>Brainstorm Together</Text>
-            </TouchableOpacity>
-        </View>
+                        <TouchableOpacity style={styles.secondaryButton}>
+                            <Text style={styles.secondaryButtonText}>Brainstorm Together</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </View>
+        </SafeAreaView>
     );
 }
+
 const styles = StyleSheet.create({
-    container: {
+    safeArea: {
         flex: 1,
-        paddingHorizontal: 24,
-        paddingTop: 60,
-        backgroundColor: '#fff',
-        alignItems: 'center',
+        backgroundColor: '#FFFFFF',
     },
-    topBar: {
+    contentContainer: {
+        flex: 1,
+        padding: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 32,
+    },
+    welcomeSection: {
+        alignItems: 'center',
+        gap: 23,
         width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    logo: {
-        width: 36,
-        height: 36,
-    },
-    icons: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    icon: {
-        width: 28,
-        height: 28,
-        marginRight: 12,
-    },
-    avatar: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
     },
     welcomeText: {
-        fontSize: 22,
-        fontWeight: '600',
-        marginTop: 20,
+        fontSize: 23,
+        fontWeight: '800',
+        fontFamily: 'Avenir',
+        color: '#222222',
     },
-    dishImage: {
+    chefImage: {
         width: 240,
         height: 240,
-        marginVertical: 20,
     },
-    subtitle: {
-        fontSize: 16,
-        textAlign: 'center',
-        marginBottom: 24,
-    },
-    primaryButton: {
-        backgroundColor: '#FFCC42',
-        paddingVertical: 14,
-        paddingHorizontal: 30,
-        borderRadius: 30,
+    actionSection: {
         width: '100%',
         alignItems: 'center',
-        marginBottom: 12,
+        gap: 20,
+    },
+    subtitle: {
+        fontSize: 18,
+        fontWeight: '500',
+        textAlign: 'center',
+        fontFamily: 'Avenir',
+        color: '#000000',
+        lineHeight: 23,
+    },
+    buttonsContainer: {
+        width: '100%',
+        gap: 12,
+    },
+    primaryButton: {
+        backgroundColor: '#FFCD4F',
+        borderRadius: 100,
+        paddingVertical: 10,
+        paddingHorizontal: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 48,
+    },
+    buttonContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 7,
+    },
+    linkIcon: {
+        width: 16,
+        height: 16,
     },
     primaryButtonText: {
         fontSize: 16,
-        fontWeight: '600',
-        color: '#333',
+        fontWeight: '500',
+        color: '#503C00',
+        fontFamily: 'Inter',
     },
     secondaryButton: {
-        borderColor: '#ccc',
+        borderColor: '#C5C5D7',
         borderWidth: 1,
-        paddingVertical: 14,
-        paddingHorizontal: 30,
-        borderRadius: 30,
-        width: '100%',
+        borderRadius: 100,
+        paddingVertical: 10,
+        paddingHorizontal: 16,
         alignItems: 'center',
+        justifyContent: 'center',
+        height: 48,
     },
     secondaryButtonText: {
         fontSize: 16,
         fontWeight: '500',
-        color: '#5a4400',
+        color: '#775A00',
+        fontFamily: 'Inter',
     },
 });

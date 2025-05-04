@@ -1,19 +1,49 @@
 import React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
-import { Image, View } from 'react-native';
+import { Pressable, Text, ImageSourcePropType } from 'react-native';
+import { Image, View, StyleSheet } from 'react-native';
 
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 
-// You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={18} style={{ marginBottom: -3 }} {...props} />;
+// Custom TabIcon component
+interface TabIconProps {
+  icon: ImageSourcePropType;
+  isActive: boolean;
+  label: string;
+  activeColor?: string;
+  inactiveColor?: string;
+}
+
+function TabIcon({ 
+  icon, 
+  isActive, 
+  label, 
+  activeColor = '#222222', 
+  inactiveColor = '#717171' 
+}: TabIconProps) {
+  return (
+    <View style={styles.tabIconContainer}>
+      <Image 
+        source={icon} 
+        style={[
+          styles.tabIcon, 
+          { tintColor: isActive ? activeColor : inactiveColor }
+        ]} 
+      />
+      <Text style={[
+        styles.tabLabel, 
+        { 
+          color: isActive ? activeColor : inactiveColor,
+          fontWeight: isActive ? '800' : '400'
+        }
+      ]}>
+        {label}
+      </Text>
+    </View>
+  );
 }
 
 export default function TabLayout() {
@@ -23,15 +53,21 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        // Disable the static render of the header on web
-        // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, true),
+        tabBarStyle: styles.tabBar,
       }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Learn',
+          tabBarIcon: ({ focused }) => (
+            <TabIcon 
+              icon={require('../../assets/icons/learn_icon.svg')} 
+              isActive={focused} 
+              label="Learn"
+            />
+          ),
+          tabBarLabel: () => null,
           headerRight: () => (
             <Link href="/modal" asChild>
               <Pressable>
@@ -51,36 +87,109 @@ export default function TabLayout() {
       <Tabs.Screen
         name="cook"
         options={{
-          title: 'Cook', // Optional: hide screen title if you're using a logo
-          tabBarIcon: ({ color }) => <TabBarIcon name="coffee" color={color} />,
+          title: 'Cook',
+          tabBarIcon: ({ focused }) => (
+            <TabIcon 
+              icon={require('../../assets/icons/cook_icon_active.svg')} 
+              isActive={focused} 
+              label="Cook"
+              activeColor="#D28F38"
+            />
+          ),
+          tabBarLabel: () => null,
           headerTitle: () => null,
           headerLeft: () => (
             <Image
-              source={require('@/assets/logo.png')} // replace with your actual logo path
-              style={{ width: 32, height: 32, marginLeft: 15 }}
-              resizeMode="contain"
+              source={require('../../assets/icons/logo.svg')}
+              style={styles.headerLogo}
             />
           ),
           headerRight: () => (
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginRight: 15 }}>
-              <FontAwesome name="bell" size={24} color="gray" />
+            <View style={styles.headerRightContainer}>
+              <View style={styles.notificationContainer}>
+                <Image
+                  source={require('../../assets/icons/notification_icon.svg')}
+                  style={styles.notificationIcon}
+                />
+              </View>
               <Image
-                source={{ uri: 'https://your-avatar-url.com/avatar.jpg' }} // replace with real URL or local image
-                style={{ width: 30, height: 30, borderRadius: 15 }}
+                source={require('../../assets/icons/user_avatar.png')}
+                style={styles.avatar}
               />
             </View>
           ),
+          headerStyle: {
+            height: 90,
+          },
+          headerLeftContainerStyle: {
+            paddingLeft: 20,
+          },
+          headerRightContainerStyle: {
+            paddingRight: 20,
+          },
         }}
       />
       <Tabs.Screen
         name="two"
         options={{
-          title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Explore',
+          tabBarIcon: ({ focused }) => (
+            <TabIcon 
+              icon={require('../../assets/icons/explore_icon.svg')} 
+              isActive={focused} 
+              label="Explore"
+            />
+          ),
+          tabBarLabel: () => null,
         }}
       />
-
     </Tabs>
-
   );
 }
+
+const styles = StyleSheet.create({
+  headerLogo: {
+    width: 24,
+    height: 24,
+  },
+  headerRightContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 24,
+  },
+  notificationContainer: {
+    backgroundColor: '#FCFCFC',
+    borderRadius: 999,
+    padding: 8,
+  },
+  notificationIcon: {
+    width: 24,
+    height: 24,
+  },
+  avatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#F7F7F7',
+  },
+  tabBar: {
+    height: 60,
+    paddingVertical: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#EBEBEB',
+  },
+  tabIconContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 1,
+  },
+  tabIcon: {
+    width: 24,
+    height: 24,
+  },
+  tabLabel: {
+    fontSize: 10,
+    fontFamily: 'Avenir',
+  }
+});
