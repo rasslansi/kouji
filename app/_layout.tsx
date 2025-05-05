@@ -53,6 +53,18 @@ function RootLayoutNav() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+        <Stack.Screen 
+          name="recipe/index" 
+          options={{ 
+            title: 'Recipe Details', // Or keep default path name
+            headerShown: true, 
+            // Add other header customizations if needed
+            // headerBackTitleVisible: false,
+            // headerStyle: { backgroundColor: '#f4511e' },
+            // headerTintColor: '#fff',
+            // headerTitleStyle: { fontWeight: 'bold' },
+          }}
+        />
       </Stack>
     </ThemeProvider>
   );
