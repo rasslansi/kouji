@@ -1,8 +1,8 @@
-import React from 'react';
+import * as React from 'react';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Link, Tabs } from 'expo-router';
-import { Pressable, Text, ImageSourcePropType } from 'react-native';
-import { Image, View, StyleSheet } from 'react-native';
+import { Pressable, Text, ImageSourcePropType, Image, View } from 'react-native';
+import 'nativewind';
 
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
@@ -25,21 +25,15 @@ function TabIcon({
   inactiveColor = '#717171' 
 }: TabIconProps) {
   return (
-    <View style={styles.tabIconContainer}>
+    <View className="items-center justify-center gap-0.5">
       <Image 
         source={icon} 
-        style={[
-          styles.tabIcon, 
-          { tintColor: isActive ? activeColor : inactiveColor }
-        ]} 
+        className="w-6 h-6"
+        style={{ tintColor: isActive ? activeColor : inactiveColor }}
       />
-      <Text style={[
-        styles.tabLabel, 
-        { 
-          color: isActive ? activeColor : inactiveColor,
-          fontWeight: isActive ? '800' : '400'
-        }
-      ]}>
+      <Text className={`text-xs font-['Avenir'] ${isActive ? 'font-extrabold' : 'font-normal'}`}
+        style={{ color: isActive ? activeColor : inactiveColor }}
+      >
         {label}
       </Text>
     </View>
@@ -48,19 +42,25 @@ function TabIcon({
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: useClientOnlyValue(false, true),
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: {
+          height: 60,
+          paddingVertical: 8,
+          borderTopWidth: 1,
+          borderTopColor: '#EBEBEB',
+        },
       }}>
       <Tabs.Screen
         name="index"
         options={{
           title: 'Learn',
-          tabBarIcon: ({ focused }) => (
+          tabBarIcon: ({ focused }: { focused: boolean }) => (
             <TabIcon 
               icon={require('../../assets/icons/learn_icon.svg')} 
               isActive={focused} 
@@ -88,7 +88,7 @@ export default function TabLayout() {
         name="cook"
         options={{
           title: 'Cook',
-          tabBarIcon: ({ focused }) => (
+          tabBarIcon: ({ focused }: { focused: boolean }) => (
             <TabIcon 
               icon={require('../../assets/icons/cook_icon_active.svg')} 
               isActive={focused} 
@@ -101,20 +101,20 @@ export default function TabLayout() {
           headerLeft: () => (
             <Image
               source={require('../../assets/icons/logo.svg')}
-              style={styles.headerLogo}
+              className="w-6 h-6"
             />
           ),
           headerRight: () => (
-            <View style={styles.headerRightContainer}>
-              <View style={styles.notificationContainer}>
+            <View className="flex-row items-center gap-6">
+              <View className="bg-[#FCFCFC] rounded-full p-2">
                 <Image
                   source={require('../../assets/icons/notification_icon.svg')}
-                  style={styles.notificationIcon}
+                  className="w-6 h-6"
                 />
               </View>
               <Image
                 source={require('../../assets/icons/user_avatar.png')}
-                style={styles.avatar}
+                className="w-8 h-8 rounded-full border border-[#F7F7F7]"
               />
             </View>
           ),
@@ -133,7 +133,7 @@ export default function TabLayout() {
         name="two"
         options={{
           title: 'Explore',
-          tabBarIcon: ({ focused }) => (
+          tabBarIcon: ({ focused }: { focused: boolean }) => (
             <TabIcon 
               icon={require('../../assets/icons/explore_icon.svg')} 
               isActive={focused} 
@@ -146,50 +146,3 @@ export default function TabLayout() {
     </Tabs>
   );
 }
-
-const styles = StyleSheet.create({
-  headerLogo: {
-    width: 24,
-    height: 24,
-  },
-  headerRightContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 24,
-  },
-  notificationContainer: {
-    backgroundColor: '#FCFCFC',
-    borderRadius: 999,
-    padding: 8,
-  },
-  notificationIcon: {
-    width: 24,
-    height: 24,
-  },
-  avatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#F7F7F7',
-  },
-  tabBar: {
-    height: 60,
-    paddingVertical: 8,
-    borderTopWidth: 1,
-    borderTopColor: '#EBEBEB',
-  },
-  tabIconContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 1,
-  },
-  tabIcon: {
-    width: 24,
-    height: 24,
-  },
-  tabLabel: {
-    fontSize: 10,
-    fontFamily: 'Avenir',
-  }
-});

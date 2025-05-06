@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import * as React from 'react';
 import {
   View,
   Text,
   Image,
-  StyleSheet,
   TouchableOpacity,
   StatusBar,
   SafeAreaView,
@@ -33,6 +32,10 @@ import {
   em,
   BASE_FONT_SIZE
 } from '../../utils/responsive';
+import { useEffect } from 'react';
+import { useRef } from 'react';
+import { useState } from 'react';
+import 'nativewind';
 
 // Comment out Voice implementation
 // let Voice: any = null;
@@ -186,479 +189,177 @@ export default function CookingScreen() {
 
   if (!recipe || !currentStep) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView className="flex-1 bg-white">
         <StatusBar barStyle="dark-content" />
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading recipe...</Text>
+        <View className="flex-1 justify-center items-center">
+          <Text className="text-lg font-medium text-gray-800">Loading recipe...</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-white">
       <StatusBar barStyle="dark-content" />
       
-      {/* Step indicator and progress bar */}
-      <View style={styles.progressContainer}>
-        <View style={styles.stepIndicator}>
-          <Text style={styles.stepIndicatorText}>
-            Step {currentStepIndex + 1}/{recipe.steps.length}
-          </Text>
-        </View>
-        <View style={styles.progressBarContainer}>
-          <View 
-            style={[styles.progressBar, { width: `${stepProgress}%` }]} 
-          />
-        </View>
+      {/* Progress bar at top */}
+      <View className="h-1.5 bg-gray-200 w-full">
+        <View className="h-full bg-amber-400" style={{ width: `${stepProgress}%` }} />
       </View>
       
-      {/* Step Instructions */}
-      <ScrollView 
-        style={styles.stepContainer}
-        contentContainerStyle={styles.stepContentContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Current step card */}
-        <View style={styles.currentStepCard}>
-          <View style={styles.stepHeader}>
-            <Text style={styles.stepCounter}>Step {currentStepIndex + 1}</Text>
-            <Text style={styles.stepTitle}>{currentStep.title}</Text>
+      <View className="flex-1 py-4">
+        {/* Current Step Card */}
+        <View className="bg-white rounded-xl mx-4 p-5 shadow-md border border-gray-100">
+          <View className="mb-2">
+            <Text className="text-lg font-bold text-gray-800">{currentStep.title}</Text>
+            <Text className="text-xs text-gray-500 mt-1">
+              Step {currentStepIndex + 1} of {recipe.steps.length}
+            </Text>
           </View>
-          <Text style={styles.stepDescription}>
-            {currentStep.description}
-          </Text>
+          
+          <ScrollView className="mb-3 max-h-[200px]">
+            <Text className="text-base text-gray-700 leading-5">
+              {currentStep.description}
+            </Text>
+          </ScrollView>
+          
+          {currentStep.imageUrl && (
+            <Image 
+              source={{ uri: currentStep.imageUrl }}
+              className="w-full h-36 rounded-lg mt-2"
+              resizeMode="cover"
+            />
+          )}
         </View>
         
-        {/* Next step card (faded) */}
+        {/* Next Step Preview */}
         {nextStep && (
-          <View style={styles.nextStepCard}>
-            <View style={styles.stepHeader}>
-              <Text style={styles.stepCounter}>Next Step</Text>
-              <Text style={styles.stepTitle}>{nextStep.title}</Text>
+          <View className="bg-gray-50 rounded-xl mx-4 mt-4 p-4 border border-gray-200">
+            <View className="mb-1">
+              <Text className="text-sm font-medium text-gray-600">Next: {nextStep.title}</Text>
             </View>
-            <Text style={styles.stepDescription}>
+            <Text className="text-sm text-gray-500" numberOfLines={2}>
               {nextStep.description}
             </Text>
           </View>
         )}
-      </ScrollView>
-      <View style={styles.micContainer}>
-        <View style={styles.micButtonContainer}>
-          {/* Voice wave animations */}
-          {isListening && (
-            <>
-              <Animated.View 
-                style={[
-                  styles.voiceWave,
-                  {
-                    transform: [
-                      { scale: wave1.interpolate({ inputRange: [0, 1], outputRange: [1, 2] }) }
-                    ],
-                    opacity: wave1.interpolate({ inputRange: [0, 1], outputRange: [0.6, 0] })
-                  }
-                ]} 
-              />
-              <Animated.View 
-                style={[
-                  styles.voiceWave,
-                  {
-                    transform: [
-                      { scale: wave2.interpolate({ inputRange: [0, 1], outputRange: [1, 1.7] }) }
-                    ],
-                    opacity: wave2.interpolate({ inputRange: [0, 1], outputRange: [0.5, 0] })
-                  }
-                ]} 
-              />
-              <Animated.View 
-                style={[
-                  styles.voiceWave,
-                  {
-                    transform: [
-                      { scale: wave3.interpolate({ inputRange: [0, 1], outputRange: [1, 1.4] }) }
-                    ],
-                    opacity: wave3.interpolate({ inputRange: [0, 1], outputRange: [0.4, 0] })
-                  }
-                ]} 
-              />
-            </>
-          )}
-          
-          {/* Outer circle (transparent with border) */}
-          <Animated.View 
-            style={[
-              styles.outerCircle3, 
-              { transform: [{ scale: isListening ? outerCircleScale : 1 }] }
-            ]} 
-          />
-          
-          {/* Middle circle (light gray with border) */}
-          <Animated.View 
-            style={[
-              styles.outerCircle2, 
-              { transform: [{ scale: isListening ? circleScale : 1 }] }
-            ]} 
-          />
-          
-          {/* Mic button with gradient */}
-          <LinearGradient
-            colors={['#F1F1F1', '#F7F7F7', '#FAFAFA']}
-            style={styles.micButton}
+        
+        {/* Voice Assistant Button */}
+        <View className="items-center justify-center mt-6">
+          <TouchableOpacity 
+            onPress={toggleListening}
+            className="relative items-center justify-center"
           >
-            <TouchableOpacity 
-              onPress={toggleListening}
-              style={styles.micTouchArea}
-              activeOpacity={0.8}
+            {/* Animated Voice Waves */}
+            {isListening && (
+              <>
+                <Animated.View 
+                  className="absolute w-28 h-28 rounded-full bg-amber-100"
+                  style={{
+                    opacity: wave1.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0.5, 0]
+                    }),
+                    transform: [
+                      { scale: wave1.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [1, 1.6]
+                        })
+                      }
+                    ]
+                  }}
+                />
+                <Animated.View 
+                  className="absolute w-24 h-24 rounded-full bg-amber-200"
+                  style={{
+                    opacity: wave2.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0.5, 0]
+                    }),
+                    transform: [
+                      { scale: wave2.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [1, 1.5]
+                        })
+                      }
+                    ]
+                  }}
+                />
+                <Animated.View 
+                  className="absolute w-20 h-20 rounded-full bg-amber-300"
+                  style={{
+                    opacity: wave3.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0.5, 0]
+                    }),
+                    transform: [
+                      { scale: wave3.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [1, 1.4]
+                        })
+                      }
+                    ]
+                  }}
+                />
+              </>
+            )}
+            
+            {/* Mic Button */}
+            <Animated.View
+              className="w-16 h-16 rounded-full bg-amber-400 items-center justify-center"
+              style={{
+                transform: [{ scale: micScale }]
+              }}
             >
-              <Animated.View 
-                style={[
-                  styles.micIconContainer,
-                  { transform: [{ scale: micScale }] }
-                ]}
-              >
-                {isListening ? (
-                  <Animated.View style={[styles.listeningIndicator, { opacity: pulseOpacity }]}>
-                    <MaterialIcons name="mic" size={24} color="#D19511" />
-                  </Animated.View>
-                ) : (
-                  <Image 
-                    source={require('../../assets/icons/mic_icon_1.svg')}
-                    style={styles.micIcon}
-                  />
-                )}
-              </Animated.View>
-            </TouchableOpacity>
-          </LinearGradient>
+              <MaterialIcons 
+                name={isListening ? "mic" : "mic-none"} 
+                size={28} 
+                color="#775A00" 
+              />
+            </Animated.View>
+            
+            <Text className="text-sm font-medium text-gray-700 mt-2">
+              {isListening ? "Listening..." : "Tap to speak"}
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
       
-      {/* Bottom navigation bar */}
-      <View style={styles.navigationBar}>
-        <TouchableOpacity 
-          style={[
-            styles.navButton,
-            currentStepIndex === 0 && styles.disabledButton
-          ]}
+      {/* Navigation bar at bottom */}
+      <View className="flex-row border-t border-gray-200 p-4">
+        <TouchableOpacity
+          className={`flex-1 py-3 rounded-full border items-center justify-center mr-2 ${
+            currentStepIndex === 0 ? 'border-gray-300 bg-gray-100' : 'border-amber-400'
+          }`}
           onPress={handlePreviousStep}
           disabled={currentStepIndex === 0}
         >
-          <View style={styles.buttonContentContainer}>
-            <MaterialIcons 
-              name="chevron-left" 
-              size={24} 
-              color={currentStepIndex === 0 ? "#C5C5D7" : "#775A00"} 
-            />
-            <Text style={[
-              styles.navButtonText,
-              currentStepIndex === 0 && styles.disabledButtonText
-            ]}>Previous Step</Text>
-          </View>
+          <Text className={`font-medium ${
+            currentStepIndex === 0 ? 'text-gray-400' : 'text-amber-600'
+          }`}>
+            Previous
+          </Text>
         </TouchableOpacity>
         
-        <TouchableOpacity 
-          style={[
-            styles.navButton,
-            styles.primaryButton,
-            currentStepIndex === recipe.steps.length - 1 && styles.finishButton
-          ]}
-          onPress={currentStepIndex === recipe.steps.length - 1 ? () => router.push('/cook') : handleNextStep}
+        <TouchableOpacity
+          className={`flex-1 py-3 rounded-full items-center justify-center ml-2 ${
+            currentStepIndex === recipe.steps.length - 1 
+              ? 'bg-green-500' 
+              : 'bg-amber-400'
+          }`}
+          onPress={currentStepIndex === recipe.steps.length - 1 
+            ? () => router.push('/recipe')
+            : handleNextStep}
         >
-          <View style={styles.buttonContentContainer}>
-            <Text style={styles.primaryButtonText}>
-              {currentStepIndex === recipe.steps.length - 1 ? "Finish" : "Next Step"}
-            </Text>
-            <MaterialIcons 
-              name={currentStepIndex === recipe.steps.length - 1 ? "check" : "chevron-right"} 
-              size={24} 
-              color="#503C00" 
-            />
-          </View>
+          <Text className={`font-medium ${
+            currentStepIndex === recipe.steps.length - 1 
+              ? 'text-white' 
+              : 'text-amber-900'
+          }`}>
+            {currentStepIndex === recipe.steps.length - 1 ? 'Finish' : 'Next'}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
-}
-
-interface Styles {
-  container: ViewStyle;
-  progressContainer: ViewStyle;
-  progressBarContainer: ViewStyle;
-  progressBar: ViewStyle;
-  micButtonContainer: ViewStyle;
-  micContainer: ViewStyle;
-  outerCircle3: ViewStyle;
-  outerCircle2: ViewStyle;
-  micButton: ViewStyle;
-  micTouchArea: ViewStyle;
-  micIcon: ImageStyle;
-  micIconContainer: ViewStyle;
-  listeningIndicator: ViewStyle;
-  voiceWave: ViewStyle;
-  stepContainer: ViewStyle;
-  stepContentContainer: ViewStyle;
-  currentStepCard: ViewStyle;
-  nextStepCard: ViewStyle;
-  stepHeader: ViewStyle;
-  stepTitle: TextStyle;
-  stepDescription: TextStyle;
-  stepCounter: TextStyle;
-  navigationBar: ViewStyle;
-  navButton: ViewStyle;
-  buttonContentContainer: ViewStyle;
-  navButtonText: TextStyle;
-  primaryButton: ViewStyle;
-  primaryButtonText: TextStyle;
-  disabledButton: ViewStyle;
-  disabledButtonText: TextStyle;
-  finishButton: ViewStyle;
-  loadingContainer: ViewStyle;
-  loadingText: TextStyle;
-  stepIndicator: ViewStyle;
-  stepIndicatorText: TextStyle;
-}
-
-const styles = StyleSheet.create<Styles>({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    fontSize: 20,
-    fontWeight: '500',
-    color: '#222222',
-  },
-  progressContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#EBEBEB',
-  },
-  progressBarContainer: {
-    flex: 1,
-    height: 8,
-    backgroundColor: '#EEEEEE',
-    borderRadius: 100,
-    overflow: 'hidden',
-    marginLeft: 12,
-  },
-  progressBar: {
-    height: '100%',
-    backgroundColor: '#FFCD4F',
-    borderRadius: 100,
-  },
-  stepIndicator: {
-    backgroundColor: '#FFF9E5',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 16,
-  },
-  stepIndicatorText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#D19511',
-  },
-  micContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '50%',
-    width: '100%',
-    paddingTop: 12,
-    paddingBottom: 12,
-  },
-  micButtonContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '80%',
-    aspectRatio: 1,
-    maxWidth: SCREEN_WIDTH * 0.4,
-    maxHeight: SCREEN_WIDTH * 0.4,
-  },
-  voiceWave: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    borderRadius: 999,
-    backgroundColor: '#FFCD4F',
-    opacity: 0.3,
-  },
-  outerCircle3: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%', 
-    borderRadius: 999,
-    borderWidth: 1.5,
-    borderColor: 'rgba(192, 192, 192, 0.1)',
-  },
-  outerCircle2: {
-    position: 'absolute',
-    width: '85%',
-    height: '85%',
-    borderRadius: 999,
-    backgroundColor: 'rgba(246, 246, 246, 0.66)',
-    borderWidth: 1.5,
-    borderColor: 'rgba(196, 196, 196, 0.08)',
-    shadowColor: '#BFBFBF',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  micButton: {
-    width: '70%',
-    height: '70%',
-    borderRadius: 999,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(225, 225, 225, 0.19)',
-    shadowColor: '#BABABA',
-    shadowOffset: { width: 0, height: 14 },
-    shadowOpacity: 0.22,
-    shadowRadius: 32,
-    elevation: 8,
-  },
-  micTouchArea: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 999,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  micIcon: {
-    width: 32,
-    height: 32,
-    tintColor: '#D19511',
-  },
-  micIconContainer: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  listeningIndicator: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  stepContainer: {
-    height: '50%',
-    width: '100%',
-    paddingHorizontal: 16,
-  },
-  stepContentContainer: {
-    paddingTop: 16,
-    paddingBottom: 12,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-  },
-  currentStepCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 20,
-    width: '100%',
-    alignItems: 'center',
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  nextStepCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 20,
-    width: '100%',
-    alignItems: 'center',
-    opacity: 0.4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  stepHeader: {
-    alignItems: 'center',
-    marginBottom: 8,
-    width: '100%',
-  },
-  stepCounter: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#8F8F8F',
-    marginBottom: 4,
-  },
-  stepTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    fontFamily: Platform.OS === 'ios' ? 'Avenir' : 'sans-serif',
-    color: '#222222',
-    textAlign: 'center',
-  },
-  stepDescription: {
-    fontSize: 16,
-    fontWeight: '300',
-    fontFamily: Platform.OS === 'ios' ? 'Avenir' : 'sans-serif',
-    color: '#222222',
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  navigationBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    paddingBottom: Platform.OS === 'ios' ? 28 : 12,
-    backgroundColor: 'white',
-    borderTopWidth: 1,
-    borderTopColor: '#EBEBEB',
-  },
-  navButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 0,
-    borderRadius: 100,
-    flex: 1,
-    marginHorizontal: 4,
-  },
-  buttonContentContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  disabledButton: {
-    backgroundColor: '#F5F5F5',
-  },
-  disabledButtonText: {
-    color: '#AAAAAA',
-  },
-  navButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#775A00',
-    marginLeft: 4,
-  },
-  primaryButton: {
-    backgroundColor: '#FBD259',
-  },
-  finishButton: {
-    backgroundColor: '#4CAF50',
-  },
-  primaryButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#503C00',
-    marginRight: 4,
-  },
-}); 
+} 

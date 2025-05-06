@@ -1,46 +1,57 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
+import { View, Text, Image, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
 import { router } from 'expo-router';
+import 'nativewind'; // Use className prop directly without styled
+import { useColorScheme } from '@/components/useColorScheme';
 
 export default function CookScreen() {
+    const colorScheme = useColorScheme();
+    const isDark = colorScheme === 'dark';
+    
     return (
-        <SafeAreaView style={styles.safeArea}>
-            <StatusBar barStyle="dark-content" />
+        <SafeAreaView className={`flex-1 ${isDark ? 'bg-background-dark' : 'bg-background-light'}`}>
+            <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
             
             {/* Main Content */}
-            <View style={styles.contentContainer}>
+            <View className="flex-1 p-4 justify-center items-center space-y-8">
                 {/* Welcome Section */}
-                <View style={styles.welcomeSection}>
-                    <Text style={styles.welcomeText}>Welcome, Chef Rass!</Text>
+                <View className="items-center space-y-6 w-full">
+                    <Text className={`text-2xl font-extrabold ${isDark ? 'text-text-dark' : 'text-text-light'} font-['Avenir']`}>
+                        Welcome, Chef Rass!
+                    </Text>
                     <Image
                         source={require('../../assets/icons/chef_image.png')}
-                        style={styles.chefImage}
+                        className="w-60 h-60"
                         resizeMode="contain"
                     />
                 </View>
 
                 {/* Description & Buttons */}
-                <View style={styles.actionSection}>
-                    <Text style={styles.subtitle}>
+                <View className="w-full items-center space-y-5">
+                    <Text className={`text-lg font-medium text-center ${isDark ? 'text-text-dark' : 'text-text-light'} leading-6 font-['Avenir']`}>
                         Ready to turn fresh ingredients into happy bites?
                     </Text>
                     
-                    <View style={styles.buttonsContainer}>
+                    <View className="w-full space-y-3">
                         <TouchableOpacity 
-                            style={styles.primaryButton}
+                            className="bg-primary rounded-full py-2.5 px-4 items-center justify-center h-12"
                             onPress={() => router.push('/recipe')}
                         >
-                            <View style={styles.buttonContent}>
+                            <View className="flex-row items-center space-x-2">
                                 <Image 
                                     source={require('../../assets/icons/link_icon.svg')}
-                                    style={styles.linkIcon}
+                                    className="w-4 h-4"
                                 />
-                                <Text style={styles.primaryButtonText}>Import a recipe</Text>
+                                <Text className="text-base font-medium text-secondary font-['Inter']">
+                                    Import a recipe
+                                </Text>
                             </View>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.secondaryButton}>
-                            <Text style={styles.secondaryButtonText}>Brainstorm Together</Text>
+                        <TouchableOpacity className="border border-border rounded-full py-2.5 px-4 items-center justify-center h-12">
+                            <Text className="text-base font-medium text-accent font-['Inter']">
+                                Brainstorm Together
+                            </Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -48,89 +59,3 @@ export default function CookScreen() {
         </SafeAreaView>
     );
 }
-
-const styles = StyleSheet.create({
-    safeArea: {
-        flex: 1,
-        backgroundColor: '#FFFFFF',
-    },
-    contentContainer: {
-        flex: 1,
-        padding: 16,
-        justifyContent: 'center',
-        alignItems: 'center',
-        gap: 32,
-    },
-    welcomeSection: {
-        alignItems: 'center',
-        gap: 23,
-        width: '100%',
-    },
-    welcomeText: {
-        fontSize: 23,
-        fontWeight: '800',
-        fontFamily: 'Avenir',
-        color: '#222222',
-    },
-    chefImage: {
-        width: 240,
-        height: 240,
-    },
-    actionSection: {
-        width: '100%',
-        alignItems: 'center',
-        gap: 20,
-    },
-    subtitle: {
-        fontSize: 18,
-        fontWeight: '500',
-        textAlign: 'center',
-        fontFamily: 'Avenir',
-        color: '#000000',
-        lineHeight: 23,
-    },
-    buttonsContainer: {
-        width: '100%',
-        gap: 12,
-    },
-    primaryButton: {
-        backgroundColor: '#FFCD4F',
-        borderRadius: 100,
-        paddingVertical: 10,
-        paddingHorizontal: 16,
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: 48,
-    },
-    buttonContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 7,
-    },
-    linkIcon: {
-        width: 16,
-        height: 16,
-    },
-    primaryButtonText: {
-        fontSize: 16,
-        fontWeight: '500',
-        color: '#503C00',
-        fontFamily: 'Inter',
-    },
-    secondaryButton: {
-        borderColor: '#C5C5D7',
-        borderWidth: 1,
-        borderRadius: 100,
-        paddingVertical: 10,
-        paddingHorizontal: 16,
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: 48,
-    },
-    secondaryButtonText: {
-        fontSize: 16,
-        fontWeight: '500',
-        color: '#775A00',
-        fontFamily: 'Inter',
-    },
-});

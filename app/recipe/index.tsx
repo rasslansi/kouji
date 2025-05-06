@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -19,6 +19,7 @@ import {
 import { router, useLocalSearchParams } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { chickenPiccataRecipe, Recipe, getRecipeById, Ingredient, Equipment, Technique } from '../../mocks/recipeSteps';
+import 'nativewind';
 
 const IMAGE_HEIGHT = 300;
 const HEADER_HEIGHT = 100; // Approx height of Title + Tabs combined
@@ -26,18 +27,18 @@ const { width } = Dimensions.get('window');
 
 // Ingredient Card Component
 const IngredientCard = ({ ingredient }: { ingredient: Ingredient }) => (
-  <View style={styles.ingredientCard}>
-    <View style={styles.ingredientInfo}>
-      <Text style={styles.ingredientName}>{ingredient.name}</Text>
-      <Text style={styles.ingredientQuantity}>
+  <View className="bg-white rounded-lg p-3 mb-3 border border-gray-100 shadow-sm">
+    <View className="flex-1">
+      <Text className="text-base font-semibold text-gray-800">{ingredient.name}</Text>
+      <Text className="text-sm text-gray-600 mt-1">
         {ingredient.quantity} {ingredient.unit || ''}
         {ingredient.preparation ? ` (${ingredient.preparation})` : ''}
       </Text>
       {ingredient.notes && (
-        <Text style={styles.ingredientNotes}>{ingredient.notes}</Text>
+        <Text className="text-xs text-gray-500 mt-1 italic">{ingredient.notes}</Text>
       )}
       {ingredient.isOptional && (
-        <Text style={styles.optionalTag}>Optional</Text>
+        <Text className="text-xs text-amber-700 font-medium mt-1 bg-amber-50 self-start px-2 py-0.5 rounded">Optional</Text>
       )}
     </View>
   </View>
@@ -45,19 +46,19 @@ const IngredientCard = ({ ingredient }: { ingredient: Ingredient }) => (
 
 // Equipment Card Component
 const EquipmentCard = ({ equipment }: { equipment: Equipment }) => (
-  <View style={styles.equipmentCard}>
-    <View style={styles.equipmentIcon}>
+  <View className="flex-row bg-white rounded-lg p-4 mb-3 border border-gray-100 shadow-sm">
+    <View className="w-10 h-10 rounded-full bg-amber-50 items-center justify-center mr-3">
       <MaterialIcons name="restaurant" size={24} color="#FFCD4F" />
     </View>
-    <View style={styles.equipmentInfo}>
-      <Text style={styles.equipmentName}>{equipment.name}</Text>
+    <View className="flex-1">
+      <Text className="text-base font-semibold text-gray-800">{equipment.name}</Text>
       {equipment.notes && (
-        <Text style={styles.equipmentNotes}>{equipment.notes}</Text>
+        <Text className="text-sm text-gray-600 mt-1">{equipment.notes}</Text>
       )}
       {equipment.alternatives && equipment.alternatives.length > 0 && (
-        <View style={styles.alternativesContainer}>
-          <Text style={styles.alternativesLabel}>Alternatives:</Text>
-          <Text style={styles.alternativesText}>{equipment.alternatives.join(', ')}</Text>
+        <View className="mt-2">
+          <Text className="text-xs font-medium text-gray-700">Alternatives:</Text>
+          <Text className="text-sm text-gray-600">{equipment.alternatives.join(', ')}</Text>
         </View>
       )}
     </View>
@@ -66,23 +67,28 @@ const EquipmentCard = ({ equipment }: { equipment: Equipment }) => (
 
 // Technique Card Component
 const TechniqueCard = ({ technique }: { technique: Technique }) => (
-  <View style={styles.techniqueCard}>
-    <View style={styles.techniqueHeader}>
-      <Text style={styles.techniqueName}>{technique.name}</Text>
-      <View style={[
-        styles.difficultyBadge, 
-        technique.difficulty === 'easy' ? styles.easyBadge 
-          : technique.difficulty === 'medium' ? styles.mediumBadge 
-          : styles.hardBadge
-      ]}>
-        <Text style={styles.difficultyText}>{technique.difficulty.toUpperCase()}</Text>
+  <View className="bg-white rounded-lg p-4 mb-3 border border-gray-100 shadow-sm">
+    <View className="flex-row justify-between items-center mb-2">
+      <Text className="text-base font-semibold text-gray-800">{technique.name}</Text>
+      <View className={`px-2 py-1 rounded-md ${
+        technique.difficulty === 'easy' ? 'bg-green-100' 
+        : technique.difficulty === 'medium' ? 'bg-amber-100' 
+        : 'bg-red-100'
+      }`}>
+        <Text className={`text-xs font-semibold ${
+          technique.difficulty === 'easy' ? 'text-green-700' 
+          : technique.difficulty === 'medium' ? 'text-amber-700' 
+          : 'text-red-700'
+        }`}>
+          {technique.difficulty.toUpperCase()}
+        </Text>
       </View>
     </View>
-    <Text style={styles.techniqueDescription}>{technique.description}</Text>
+    <Text className="text-sm text-gray-600 mb-3">{technique.description}</Text>
     {technique.videoUrl && (
-      <TouchableOpacity style={styles.videoButton}>
+      <TouchableOpacity className="flex-row items-center self-start">
         <MaterialIcons name="play-circle-filled" size={16} color="#FFCD4F" />
-        <Text style={styles.videoButtonText}>Watch Tutorial</Text>
+        <Text className="text-sm font-medium text-amber-600 ml-1">Watch Tutorial</Text>
       </TouchableOpacity>
     )}
   </View>
@@ -90,14 +96,14 @@ const TechniqueCard = ({ technique }: { technique: Technique }) => (
 
 // Tab components with real data
 const IngredientsTab = ({ recipe }: { recipe: Recipe }) => (
-  <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false} style={styles.tabContent}>
-    <Text style={styles.ingredientsIntro}>
+  <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false} className="p-4">
+    <Text className="text-base text-gray-600 mb-4 italic">
       This recipe requires {recipe.ingredients.length} ingredients. Prepare them before starting to cook.
     </Text>
     {recipe.ingredients.map(ingredient => (
       <IngredientCard key={ingredient.id} ingredient={ingredient} />
     ))}
-    <View style={{ height: 20 }} />
+    <View className="h-5" />
   </ScrollView>
 );
 
@@ -113,34 +119,34 @@ const StepsTab = ({ recipe }: { recipe: Recipe }) => {
   }, {} as Record<string, typeof recipe.steps>);
 
   return (
-    <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false} style={styles.tabContent}>
+    <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false} className="p-4">
       {Object.entries(sections).map(([sectionTitle, steps], sectionIndex) => (
         <View key={sectionTitle}>
-          <Text style={styles.sectionTitle}>{sectionTitle}</Text>
+          <Text className="text-lg font-bold text-gray-800 mb-3 mt-2">{sectionTitle}</Text>
           {steps.map((step, stepIndex) => (
-            <View key={step.id} style={styles.stepCard}>
-              <View style={styles.stepNumberContainer}>
-                <Text style={styles.stepNumber}>{step.id}</Text>
+            <View key={step.id} className="bg-white rounded-lg p-4 mb-4 border border-gray-100 shadow-sm flex-row">
+              <View className="w-8 h-8 rounded-full bg-amber-100 items-center justify-center">
+                <Text className="text-sm font-bold text-amber-700">{step.id}</Text>
               </View>
-              <View style={styles.stepDivider} />
-              <View style={styles.stepContentContainer}>
-                <View style={styles.stepHeader}>
-                  <Text style={styles.stepTitle}>{step.title}</Text>
+              <View className="w-px h-full bg-gray-200 mx-3" />
+              <View className="flex-1">
+                <View className="mb-2">
+                  <Text className="text-base font-semibold text-gray-800">{step.title}</Text>
                 </View>
-                <Text style={styles.stepDescription}>{step.description}</Text>
+                <Text className="text-sm text-gray-600 mb-3">{step.description}</Text>
                 
                 {/* Show related equipment and techniques */}
                 {step.equipmentNeeded && step.equipmentNeeded.length > 0 && (
-                  <View style={styles.stepMetaContainer}>
-                    <Text style={styles.stepMetaTitle}>Equipment:</Text>
-                    <Text style={styles.stepMetaText}>{step.equipmentNeeded.join(', ')}</Text>
+                  <View className="mt-2">
+                    <Text className="text-xs font-medium text-gray-700">Equipment:</Text>
+                    <Text className="text-sm text-gray-600">{step.equipmentNeeded.join(', ')}</Text>
                   </View>
                 )}
                 
                 {step.techniquesUsed && step.techniquesUsed.length > 0 && (
-                  <View style={styles.stepMetaContainer}>
-                    <Text style={styles.stepMetaTitle}>Techniques:</Text>
-                    <Text style={styles.stepMetaText}>{step.techniquesUsed.join(', ')}</Text>
+                  <View className="mt-2">
+                    <Text className="text-xs font-medium text-gray-700">Techniques:</Text>
+                    <Text className="text-sm text-gray-600">{step.techniquesUsed.join(', ')}</Text>
                   </View>
                 )}
               </View>
@@ -148,32 +154,32 @@ const StepsTab = ({ recipe }: { recipe: Recipe }) => {
           ))}
         </View>
       ))}
-      <View style={{ height: 20 }} />
+      <View className="h-5" />
     </ScrollView>
   );
 };
 
 const EquipmentTab = ({ recipe }: { recipe: Recipe }) => (
-  <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false} style={styles.tabContent}>
-    <Text style={styles.tabIntroText}>
+  <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false} className="p-4">
+    <Text className="text-base text-gray-600 mb-4 italic">
       Make sure you have all the necessary equipment before starting. Alternatives are provided where possible.
     </Text>
     {recipe.equipment.map(equipment => (
       <EquipmentCard key={equipment.id} equipment={equipment} />
     ))}
-    <View style={{ height: 20 }} />
+    <View className="h-5" />
   </ScrollView>
 );
 
 const TechniquesTab = ({ recipe }: { recipe: Recipe }) => (
-  <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false} style={styles.tabContent}>
-    <Text style={styles.tabIntroText}>
+  <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false} className="p-4">
+    <Text className="text-base text-gray-600 mb-4 italic">
       These cooking techniques will help you prepare this dish like a professional chef.
     </Text>
     {recipe.techniques.map(technique => (
       <TechniqueCard key={technique.id} technique={technique} />
     ))}
-    <View style={{ height: 20 }} />
+    <View className="h-5" />
   </ScrollView>
 );
 
@@ -198,135 +204,153 @@ export default function RecipePage() {
   const renderTab = () => {
     if (!recipe) return null;
     
-    switch(activeTab) {
-      case 'Ingredients': return <IngredientsTab recipe={recipe} />;
-      case 'Steps': return <StepsTab recipe={recipe} />;
-      case 'Equipment': return <EquipmentTab recipe={recipe} />;
-      case 'Techniques': return <TechniquesTab recipe={recipe} />;
-      default: return <StepsTab recipe={recipe} />;
+    switch (activeTab) {
+      case 'Steps':
+        return <StepsTab recipe={recipe} />;
+      case 'Ingredients':
+        return <IngredientsTab recipe={recipe} />;
+      case 'Equipment':
+        return <EquipmentTab recipe={recipe} />;
+      case 'Techniques':
+        return <TechniquesTab recipe={recipe} />;
+      default:
+        return <StepsTab recipe={recipe} />;
     }
   };
 
+  // Parallax effect for recipe image
+  const imageTranslateY = scrollY.interpolate({
+    inputRange: [-300, 0, 300],
+    outputRange: [150, 0, -150],
+    extrapolate: 'clamp',
+  });
+
+  // Fade in effect for recipe info container as you scroll
+  const infoContainerOpacity = scrollY.interpolate({
+    inputRange: [0, 100],
+    outputRange: [1, 0.95],
+    extrapolate: 'clamp',
+  });
+
   if (!recipe) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView className="flex-1 bg-white">
         <StatusBar barStyle="dark-content" />
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading recipe...</Text>
+        <View className="flex-1 justify-center items-center">
+          <Text className="text-lg font-medium text-gray-800">Loading recipe...</Text>
         </View>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-white">
       <StatusBar barStyle="dark-content" />
       
-      {/* Animated Header/Image Area */}
-       <Animated.View style={[
-          styles.headerContainer, 
-          {
-            height: scrollY.interpolate({
-              inputRange: [0, IMAGE_HEIGHT - HEADER_HEIGHT],
-              outputRange: [IMAGE_HEIGHT, HEADER_HEIGHT],
-              extrapolate: 'clamp'
-            })
-          }
-        ]}>
-          <Animated.Image
-             source={recipe.imageUrl ? { uri: recipe.imageUrl } : require('../../assets/images/recipe_image.png')}
-             style={[
-               styles.recipeImage,
-               {
-                 transform: [{
-                   translateY: scrollY.interpolate({
-                     inputRange: [0, IMAGE_HEIGHT - HEADER_HEIGHT],
-                     outputRange: [0, -(IMAGE_HEIGHT - HEADER_HEIGHT) / 2], // Parallax effect
-                     extrapolate: 'clamp'
-                   })
-                 },{
-                   scale: scrollY.interpolate({
-                      inputRange: [-IMAGE_HEIGHT, 0, IMAGE_HEIGHT - HEADER_HEIGHT],
-                      outputRange: [2, 1, 1], // Zoom out effect when pulling down
-                      extrapolate: 'clamp'
-                   })
-                 }]
-               }
-             ]}
-          />
-       </Animated.View>
+      {/* Recipe Image with Parallax Effect */}
+      <View className="absolute top-0 left-0 right-0 h-[300px] overflow-hidden z-[1]">
+        <Animated.Image
+          source={{ uri: recipe.imageUrl || 'https://via.placeholder.com/600x400' }}
+          className="w-full h-full"
+          style={{ transform: [{ translateY: imageTranslateY }] }}
+          resizeMode="cover"
+        />
+      </View>
       
-      {/* Main ScrollView */}
       <Animated.ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
+        className="flex-1 bg-transparent"
         scrollEventThrottle={16}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false } // Set to false for height/translateY animations
+          { useNativeDriver: true }
         )}
-        contentContainerStyle={{ paddingTop: IMAGE_HEIGHT }} // Start content below image
       >
-        {/* Static Recipe Info (below image, above tabs) */}
-        <View style={styles.recipeInfoContainer}>
-          <Text style={styles.recipeTitle}>{recipe.title}</Text>
-          <Text style={styles.recipeDescription}>{recipe.description}</Text>
-          <View style={styles.recipeMetaContainer}>
-            <View style={styles.difficultyBadge}>
-              <Text style={styles.difficultyText}>{recipe.difficulty.toUpperCase()}</Text>
+        {/* Transparent Spacer for Image */}
+        <View style={{ height: IMAGE_HEIGHT }} />
+        
+        <Animated.View 
+          className="bg-white px-4 pt-4 pb-3"
+          style={{ opacity: infoContainerOpacity }}
+        >
+          <Text className="text-2xl font-extrabold text-gray-800 mb-2">{recipe.title}</Text>
+          <Text className="text-base text-gray-600 leading-6 mb-3">{recipe.description}</Text>
+          
+          <View className="flex-row items-center my-2">
+            <View className={`${
+              recipe.difficulty === 'easy' ? 'bg-green-100' 
+              : recipe.difficulty === 'medium' ? 'bg-amber-100' 
+              : 'bg-red-100'
+            } px-3 py-1 rounded mr-3`}>
+              <Text className={`text-xs font-semibold ${
+                recipe.difficulty === 'easy' ? 'text-green-700' 
+                : recipe.difficulty === 'medium' ? 'text-amber-700'
+                : 'text-red-700'
+              }`}>
+                {recipe.difficulty.toUpperCase()}
+              </Text>
             </View>
-            <View style={styles.recipeMetaDetails}>
-              <Text style={styles.recipeMetaText}>{recipe.totalTime}</Text>
-              <Text style={styles.recipeMetaText}>{recipe.servings} servings</Text>
-              {recipe.calories && <Text style={styles.recipeMetaText}>{recipe.calories} cal</Text>}
+            
+            <View className="flex-row">
+              <Text className="text-sm text-gray-600 mr-3">
+                <MaterialIcons name="access-time" size={14} color="#777777" /> {recipe.cookTime}
+              </Text>
+              <Text className="text-sm text-gray-600 mr-3">
+                <MaterialIcons name="restaurant" size={14} color="#777777" /> {recipe.servings} servings
+              </Text>
             </View>
           </View>
           
-          {recipe.rating && (
-            <View style={styles.ratingContainer}>
-              {[1, 2, 3, 4, 5].map(star => (
-                <MaterialIcons 
-                  key={star}
-                  name={star <= Math.floor(recipe.rating || 0) ? "star" : star <= (recipe.rating || 0) ? "star-half" : "star-border"} 
-                  size={20} 
-                  color="#FFCD4F" 
-                />
-              ))}
-              <Text style={styles.ratingText}>{recipe.rating.toFixed(1)}</Text>
-            </View>
-          )}
-        </View>
-
-        {/* Tabs Bar (will appear below static info) */}
-        <View style={styles.tabsContainer}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabsScroll}>
-            {['Ingredients','Steps','Equipment','Techniques'].map(tab => (
-              <TouchableOpacity key={tab} onPress={() => setActiveTab(tab)} style={styles.tabButton}>
-                <Text style={[styles.tabText, activeTab===tab && styles.activeTabText]}>{tab}</Text>
-                {activeTab===tab && <View style={styles.activeTabIndicator}/>}
+          <View className="flex-row items-center my-2">
+            <MaterialIcons name="star" size={18} color="#FFCD4F" />
+            <MaterialIcons name="star" size={18} color="#FFCD4F" />
+            <MaterialIcons name="star" size={18} color="#FFCD4F" />
+            <MaterialIcons name="star" size={18} color="#FFCD4F" />
+            <MaterialIcons name="star-half" size={18} color="#FFCD4F" />
+            <Text className="text-sm font-medium text-gray-600 ml-2">4.7 (243 ratings)</Text>
+          </View>
+        </Animated.View>
+        
+        {/* Tabs Navigation */}
+        <View className="bg-white border-b border-gray-200">
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            className="px-4"
+          >
+            {['Steps', 'Ingredients', 'Equipment', 'Techniques'].map(tab => (
+              <TouchableOpacity
+                key={tab}
+                onPress={() => setActiveTab(tab)}
+                className="px-4 py-3 relative"
+              >
+                <Text className={`text-base font-medium ${
+                  activeTab === tab ? 'text-gray-800 font-semibold' : 'text-gray-500'
+                }`}>
+                  {tab}
+                </Text>
+                {activeTab === tab && (
+                  <View className="absolute bottom-0 left-4 right-4 h-0.75 bg-amber-400 rounded-t" />
+                )}
               </TouchableOpacity>
             ))}
           </ScrollView>
         </View>
-
-        {/* Active Tab Content (inside ScrollView) */}
-        <View style={styles.tabContentContainer}>
-           {renderTab()}
+        
+        {/* Tab Content */}
+        <View className="flex-1 bg-gray-50">
+          {renderTab()}
+        </View>
+        
+        {/* Footer with Cook Button */}
+        <View className="bg-white px-4 py-3 border-t border-gray-200">
+          <TouchableOpacity
+            className="bg-amber-400 rounded-full py-3 items-center"
+            onPress={() => router.push(`/recipe/cook?id=${recipe.id}`)}
+          >
+            <Text className="text-base font-semibold text-amber-900">Start Cooking</Text>
+          </TouchableOpacity>
         </View>
       </Animated.ScrollView>
-
-      {/* Footer */}
-      <View style={styles.footer}>
-        <TouchableOpacity 
-          style={styles.primaryButton}
-          onPress={() => router.push({
-            pathname: '/recipe/cook',
-            params: { id: recipe.id }
-          })}
-        >
-          <Text style={styles.primaryButtonText}>Let's Cook</Text>
-        </TouchableOpacity>
-      </View>
     </SafeAreaView>
   );
 }
